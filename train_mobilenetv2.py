@@ -1,86 +1,139 @@
 """
-This script trains a MobileNetV2 model on the Garbage Classification dataset
-for 12 categories (15,150 images). It uses transfer learning and fine-tuning.
+MobileNetV2 ile Garbage Classification veri seti üzerinde
+transfer learning kullanarak 12 sınıflı görüntü sınıflandırma.
 """
 
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
+
 from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
-# -- 1. Data Preparation --
-# Dataset path (Kaggle: mostafaabla/garbage-classification)
-DATASET_PATH = 'dataset/' 
 
-# Image normalization and validation split
-datagen = ImageDataGenerator(rescale=1./255, validation_split=0.2)
+# 1. Veri Hazırlama
 
-# Training Data Generator
-train_generator = datagen.flow_from_directory(
+DATASET_PATH = "dataset/"
+
+train_datagen = ImageDataGenerator(
+    rescale=1./255,
+    rotation_range=15,
+    width_shift_range=0.1,
+    height_shift_range=0.1,
+    zoom_range=0.1,
+    horizontal_flip=True,
+    validation_split=0.2
+)
+
+validation_datagen = ImageDataGenerator(
+    rescale=1./255,
+    validation_split=0.2
+)
+
+train_generator = train_datagen.flow_from_directory(
     DATASET_PATH,
     target_size=(224, 224),
     batch_size=32,
-    class_mode='categorical',
-    subset='training'
+    class_mode="categorical",
+    subset="training"
 )
 
-# Validation Data Generator
-validation_generator = datagen.flow_from_directory(
+validation_generator = validation_datagen.flow_from_directory(
     DATASET_PATH,
     target_size=(224, 224),
     batch_size=32,
-    class_mode='categorical',
-    subset='validation'
+    class_mode="categorical",
+    subset="validation",
+    shuffle=False
 )
 
-# -- 2. Model Architecture (Transfer Learning) --
-# Base model pre-trained on ImageNet
-base_model = MobileNetV2(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
 
-# Freeze the base model layers (as specified in the report)
+# 2. MobileNetV2 Modeli
+
+base_model = MobileNetV2(
+    weights="imagenet",
+    include_top=False,
+    input_shape=(224, 224, 3)
+)
+
+# Hazır modelin katmanlarını dondur
 base_model.trainable = False
 
-# Add custom classification head for 12 classes
 x = base_model.output
 x = GlobalAveragePooling2D()(x)
-x = Dense(1024, activation='relu')(x)
-predictions = Dense(train_generator.num_classes, activation='softmax')(x)
+x = Dense(1024, activation="relu")(x)
 
-model = Model(inputs=base_model.input, outputs=predictions)
+predictions = Dense(
+    train_generator.num_classes,
+    activation="softmax"
+)(x)
 
-# -- 3. Compilation --
-model.compile(optimizer=Adam(learning_rate=0.0001),
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
+model = Model(
+    inputs=base_model.input,
+    outputs=predictions
+)
 
-# -- 4. Training --
-print("Starting transfer learning on frozen base layers...")
+
+# 3. Model Derleme
+
+model.compile(
+    optimizer=Adam(learning_rate=0.0001),
+    loss="categorical_crossentropy",
+    metrics=["accuracy"]
+)
+
+
+# 4. Eğitim
+
+print("MobileNetV2 eğitimi başlıyor...")
+
 history = model.fit(
     train_generator,
-    epochs=15,  # Matches the epoch count in the technical report
+    epochs=15,
     validation_data=validation_generator
 )
 
-# -- 5. Evaluation & Confusion Matrix --
+
+# 5. Confusion Matrix
+
+validation_generator.reset()
+
 Y_pred = model.predict(validation_generator)
+
 y_pred = np.argmax(Y_pred, axis=1)
 y_true = validation_generator.classes
 
-print("Generating Confusion Matrix...")
-cm = confusion_matrix(y_true, y_pred)
-class_names = list(train_generator.class_indices.keys())
+class_names = list(
+    validation_generator.class_indices.keys()
+)
+
+cm = confusion_matrix(
+    y_true,
+    y_pred
+)
 
 plt.figure(figsize=(12, 10))
-sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
-plt.title('Confusion Matrix - MobileNetV2 Waste Classification')
-plt.ylabel('True Label')
-plt.xlabel('Predicted Label')
-plt.savefig('confusion_matrix.png')
-print("Confusion Matrix saved.")
+
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt="d",
+    cmap="Blues",
+    xticklabels=class_names,
+    yticklabels=class_names
+)
+
+plt.title("Confusion Matrix - MobileNetV2")
+plt.ylabel("True Label")
+plt.xlabel("Predicted Label")
+
+plt.tight_layout()
+plt.savefig("confusion_matrix.png")
+
+print("Confusion Matrix kaydedildi.")
