@@ -22,5 +22,5 @@ Modeller önceden eğitilmiş (Pre-trained) ağırlıklar kullanılarak transfer
 | ResNet50 | %46.42 | Sabit katman kısıtında yetersiz yakınsama |
 
 ## Repo İçeriği ve Yapısı
-*   Atık Sınıflandırmada Derin Öğrenme Performans Analizi Raporu V2.1.pdf: Literatür taramasını, eğitim hiperparametrelerini, karmaşıklık matrislerini (confusion matrix) ve detaylı ekip analizlerini barındıran tam akademik rapor.
+*   Atık Sınıflandırmada Derin Öğrenme Performans Analizi Raporu V2.1.pdf : Literatür taramasını, eğitim hiperparametrelerini, karmaşıklık matrislerini (confusion matrix) ve detaylı ekip analizlerini barındıran tam akademik rapor.
 *   `train_mobilenetv2.py`: En optimum sonuç veren MobileNetV2 mimarisinin transfer learning kurulumunu, veri çoğaltma (data augmentation) ve eğitim döngüsünü barındıran kaynak kodu.
