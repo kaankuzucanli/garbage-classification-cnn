@@ -1,24 +1,26 @@
-# Comparative Analysis of Deep Learning Models for Waste Classification
+# Atık Sınıflandırmada Derin Öğrenme Performans Analizi 
 
-## Project Overview
-This repository contains the results and core methodology of a deep learning project focused on automated waste classification for autonomous recycling systems. We evaluated `ResNet50`, `MobileNetV2`, `InceptionV3`, and `VGG16` using transfer learning on a dataset of 15,150 images across 12 categories. 
-## Dataset
-The models were trained and evaluated using the [Garbage Classification Dataset](https://www.kaggle.com/datasets/mostafaabla/garbage-classification) from Kaggle, which contains 15,150 images across 12 distinct classes (paper, cardboard, plastic, metal, etc.).
-The goal was to identify the most efficient model for resource-constrained Edge AI environments (e.g., smart waste bins).
+Bu repo, otomasyon tabanlı akıllı geri dönüşüm ve ayıklama sistemleri için derin öğrenme tabanlı görüntü işleme modellerinin başarım ve verimlilik karşılaştırmasını içermektedir.
 
-## Key Performance Indicators
-Based on our experimental training, `MobileNetV2` emerged as the optimal architecture due to its high accuracy and low computational footprint.
+## Proje Özeti ve Kapsamı
+Gelişmiş nesne tanıma sistemlerinin kaynak kısıtlı ortamlardaki (Edge AI / gömülü sistemler) davranışını incelemek amacıyla, toplam **15.150 görselden** ve **12 farklı atık sınıfından** (kağıt, plastik, metal, cam vb.) oluşan Kaggle veri seti (`Garbage Classification Dataset`) kullanılmıştır.
 
-| Model Architecture | Test Accuracy | Note |
-| :----------------- | :----------- | :--- |
-| **MobileNetV2**    | **91.44%**   | **Recommended for Edge AI (Best Accuracy / Low Memory Cost)** |
-| InceptionV3        | 88.75%       | Balanced performance |
-| VGG16               | 81.67%       | Moderate accuracy, higher memory footprint |
-| ResNet50           | 46.42%       | Suboptimal convergence within frozen training limits |
+Çalışma kapsamında endüstride standart olan dört farklı konvolüsyonel sinir ağı mimarisi ele alınmıştır:
+*   **ResNet50**
+*   **MobileNetV2**
+*   **InceptionV3**
+*   **VGG16**
 
-## Full Report & Team Contributors
-The original, comprehensive academic report (in Turkish) including detailed confusion matrices, literature review, and full team contributor credits is included in this repository as a PDF file.
+## Deneysel Sonuçlar ve Metrikler
+Modeller önceden eğitilmiş (Pre-trained) ağırlıklar kullanılarak transfer learning yöntemiyle optimize edilmiş ve doğrulama (validation) veri seti üzerindeki başarım oranları karşılaştırılmıştır:
 
-## Repository Contents
-*   `Atık Sınıflandırmada Derin Öğrenme Performans Analizi.pdf`: The original comprehensive project report.
-*   `train_mobilenetv2.py`: The core Python script demonstrating the transfer learning setup, frozen layers, and training loop for the winning MobileNetV2 architecture.
+| Model Mimarisi | Doğruluk (Accuracy) | Mimari Notu |
+| :--- | :--- | :--- |
+| **MobileNetV2** | **%91.44** | Düşük bellek maliyeti ve yüksek başarım (Önerilen Model) |
+| InceptionV3 | %88.75 | Dengeli çıkarım süresi |
+| VGG16 | %81.67 | Orta seviye başarım, yüksek bellek tüketimi |
+| ResNet50 | %46.42 | Sabit katman kısıtında yetersiz yakınsama |
+
+## Repo İçeriği ve Yapısı
+*   `Atık Sınıflandırmada Derin Öğrenme Performans Analizi.pdf`: Literatür taramasını, eğitim hiperparametrelerini, karmaşıklık matrislerini (confusion matrix) ve detaylı ekip analizlerini barındıran tam akademik rapor.
+*   `train_mobilenetv2.py`: En optimum sonuç veren MobileNetV2 mimarisinin transfer learning kurulumunu, veri çoğaltma (data augmentation) ve eğitim döngüsünü barındıran kaynak kodu.
